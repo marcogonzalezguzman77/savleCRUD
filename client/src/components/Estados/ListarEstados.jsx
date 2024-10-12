@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { OBTENER_CIUDADES_ESTADOS } from "../../graphql/queries";
 import { ACTUALIZAR_ESTADO, ELIMINAR_ESTADO } from "../../graphql/mutations";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 const ListarEstados = () => {
   const { data, loading, error } = useQuery(OBTENER_CIUDADES_ESTADOS);
@@ -26,18 +26,14 @@ const ListarEstados = () => {
     setNuevoNombre(data.obtenerEstados.find((e) => e.id === estadoId).nombre);
   };
 
-  const manejarKeyDown = async (e, estadoId) => {
-    console.log("Esto es e", e.key);
-    if (e.key === "Enter") {
-      e.preventDefault();
-      try {
-        await actualizarEstado({
-          variables: { id: estadoId, nombre: nuevoNombre },
-        });
-        setEditarEstado(null);
-      } catch (error) {
-        console.error("Error al actualizar el estado:", error);
-      }
+  const manejarGuardar = async (estadoId) => {
+    try {
+      await actualizarEstado({
+        variables: { id: estadoId, nombre: nuevoNombre },
+      });
+      setEditarEstado(null);
+    } catch (error) {
+      console.error("Error al actualizar el estado:", error);
     }
   };
 
@@ -71,19 +67,27 @@ const ListarEstados = () => {
                     className="form-control"
                     value={nuevoNombre}
                     onChange={(e) => setNuevoNombre(e.target.value)}
-                    onKeyDown={(e) => manejarKeyDown(e, estado.id)}
                   />
                 ) : (
                   estado.nombre
                 )}
               </td>
               <td>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => manejarEditar(estado.id)}
-                >
-                  <FontAwesomeIcon icon={faEdit} />
-                </button>
+                {editarEstado === estado.id ? (
+                  <button
+                    className="btn btn-success me-2"
+                    onClick={() => manejarGuardar(estado.id)}
+                  >
+                    <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => manejarEditar(estado.id)}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                )}
                 <button
                   className="btn btn-danger"
                   onClick={() => manejarEliminar(estado.id)}

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { OBTENER_CIUDADES_ESTADOS } from "../../graphql/queries";
 import { ACTUALIZAR_CIUDAD, ELIMINAR_CIUDAD } from "../../graphql/mutations";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 const ListarCiudades = () => {
   const { data, loading, error } = useQuery(OBTENER_CIUDADES_ESTADOS);
@@ -23,27 +23,23 @@ const ListarCiudades = () => {
   if (error) return <p>Error: {error.message}</p>;
 
   const manejarEditar = (ciudad) => {
-    console.log("Esto es ciudad", ciudad);
     setEditarCiudad(ciudad.id);
     setNuevoNombre(ciudad.nombre);
     setNuevoEstado(ciudad.estado.id);
   };
 
-  const manejarKeyDown = async (e, ciudadId) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      try {
-        await actualizarCiudad({
-          variables: {
-            id: ciudadId,
-            nombre: nuevoNombre,
-            estadoId: nuevoEstado,
-          },
-        });
-        setEditarCiudad(null);
-      } catch (error) {
-        console.error("Error al actualizar la ciudad:", error);
-      }
+  const manejarGuardar = async (ciudadId) => {
+    try {
+      await actualizarCiudad({
+        variables: {
+          id: ciudadId,
+          nombre: nuevoNombre,
+          estadoId: nuevoEstado,
+        },
+      });
+      setEditarCiudad(null); // Salir del modo edición después de guardar
+    } catch (error) {
+      console.error("Error al actualizar la ciudad:", error);
     }
   };
 
@@ -78,7 +74,6 @@ const ListarCiudades = () => {
                     className="form-control"
                     value={nuevoNombre}
                     onChange={(e) => setNuevoNombre(e.target.value)}
-                    onKeyDown={(e) => manejarKeyDown(e, ciudad.id)}
                   />
                 ) : (
                   ciudad.nombre
@@ -102,12 +97,21 @@ const ListarCiudades = () => {
                 )}
               </td>
               <td>
-                <button
-                  className="btn btn-warning me-2"
-                  onClick={() => manejarEditar(ciudad)}
-                >
-                  <FontAwesomeIcon icon={faEdit} />
-                </button>
+                {editarCiudad === ciudad.id ? (
+                  <button
+                    className="btn btn-success me-2"
+                    onClick={() => manejarGuardar(ciudad.id)}
+                  >
+                    <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-warning me-2"
+                    onClick={() => manejarEditar(ciudad)}
+                  >
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                )}
                 <button
                   className="btn btn-danger"
                   onClick={() => manejarEliminar(ciudad.id)}

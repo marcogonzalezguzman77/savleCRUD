@@ -84,9 +84,13 @@ const resolvers = {
           id,
           { nombre, estado: estadoId },
           { new: true }
-        );
+        ).populate("estado");
+
         return ciudadActualizada;
       } catch (error) {
+        if (error.code === 11000) {
+          throw new Error(`La ciudad "${nombre}" ya existe en este estado.`);
+        }
         throw new Error("Ocurrió un error al actualizar la ciudad.");
       }
     },
