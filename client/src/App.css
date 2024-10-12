@@ -1,0 +1,26 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  flex-shrink: 0;
+}
+
+main {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: white;
+  overflow-y: auto;
+}
+
+footer {
+  flex-shrink: 0;
+  background-color: black;
+  color: white;
+  text-align: center;
+  align-items: center;
+  font-size: large;
+  padding: 10px 0;
+}
